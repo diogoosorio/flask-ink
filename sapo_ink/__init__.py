@@ -29,19 +29,33 @@ class SapoCDN(AssetLocation):
 
 
 class AssetManager(object):
-    def __init__(self, location_map={}, minified=False, asset_version=None):
+    def __init__(
+        self, location_map={}, minified=False, asset_version=None,
+        default_location=None, append_querystring=False
+        ):
+
         self.location_map = location_map
         self.minified = minified
-        self.asset_version=asset_version
+        self.asset_version = asset_version
+        self.default_location = default_location or 'sapo'
+        self.append_querystring = append_querystring
 
-    def load(self, filename, location='sapo'):
+    def load(self, filename, location=None):
+        location = location or self.default_location
         location_instance = self.get_location_by_name(location)
+
         filename = filename.strip('/')
 
+        print self.minified
         if self.minified:
-            filename = self.get_minified_name(filename)
+            filename = self.get_minified_filename(filename)
 
-        return location_instance.get_url_for(filename)
+        asset_location = location_instance.get_url_for(filename)
+
+        if self.append_querystring:
+            asset_location = self.append_querystring_filename(asset_location)
+
+        return asset_location
 
     def get_location_by_name(self, name):
         if name in self.location_map:
@@ -59,13 +73,20 @@ class Ink(object):
         self.init_app()
 
     def init_app(self):
-        self.app.config.setdefault('INK_MINIFIED_ASSETS', False);
+        self.app.config.setdefault('INK_ASSET_MINIFY', False);
         self.app.config.setdefault('INK_ASSET_VERSION', __version__)
+        self.app.config.setdefault('INK_ASSET_DEFAULT_LOCATION', 'sapo')
+        self.app.config.setdefault('INK_ASSET_APPEND_VERSION_QUERYSTRING', False)
 
-        minified_assets = self.app.config['INK_MINIFIED_ASSETS']
+        minified_assets = self.app.config['INK_ASSET_MINIFY']
         asset_version = self.app.config['INK_ASSET_VERSION']
+        asset_location = self.app.config['INK_ASSET_DEFAULT_LOCATION']
+        append_version = self.app.config['INK_ASSET_APPEND_VERSION_QUERYSTRING']
 
-        self.assets = AssetManager(minified=minified_assets, asset_version=asset_version)
+        self.assets = AssetManager(
+            minified=minified_assets, asset_version=asset_version,
+            default_location=asset_location, append_querystring=append_version)
+
         self.make_default_asset_locations()
 
         blueprint = Blueprint(
