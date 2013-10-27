@@ -1,7 +1,7 @@
 #!/usr/env/python
 # -*- coding: utf-8 -*-
 
-from flask import g
+from flask import g, Blueprint
 
 __version__ = '2.2.1'
 
@@ -43,8 +43,8 @@ class AssetManager(object):
         return location_instance.get_url_for(filename)
 
     def get_location_by_name(self, name):
-        if key in self.location_map:
-            return self.location_map[key]
+        if name in self.location_map:
+            return self.location_map[name]
 
         raise ValueError("Unkown location instance {location_name}.".format(location_name=name))
 
@@ -67,8 +67,15 @@ class Ink(object):
         self.assets = AssetManager(minified=minified_assets, asset_version=asset_version)
         self.make_default_asset_locations()
 
-        with self.app.app_context():
-            g.ink = self
+        blueprint = Blueprint(
+            'ink',
+            __name__,
+            template_folder='templates',
+            static_folder='static',
+            static_url_path=self.app.static_url_path+'/ink')
+
+        self.app.register_blueprint(blueprint)
+        self.app.jinja_env.globals.update(ink_load_asset=self.assets.load)
 
     def make_default_asset_locations(self):
         sapo = SapoCDN()
