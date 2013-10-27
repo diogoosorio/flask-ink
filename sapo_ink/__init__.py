@@ -1,7 +1,7 @@
 #!/usr/env/python
 # -*- coding: utf-8 -*-
 
-from flask import g, Blueprint
+from flask import g, Blueprint, url_for
 
 __version__ = '2.2.1'
 
@@ -15,6 +15,7 @@ class LocalAssets(AssetLocation):
         self.directory = directory
 
     def get_url_for(self, filename):
+        filename = "ink/{0}".format(filename)
         return url_for(self.directory, filename=filename)
 
 
