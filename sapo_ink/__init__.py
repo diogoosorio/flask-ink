@@ -32,7 +32,7 @@ class AssetManager(object):
         self.location_map = location_map
         self.minified = minified
 
-    def load_static_asset(self, filename, location='sapo'):
+    def load(self, filename, location='sapo'):
         location_instance = self.get_location_by_name(location)
         filename = filename.strip('/')
 
