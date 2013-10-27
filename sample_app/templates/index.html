@@ -1,1 +1,45 @@
 {% extends "ink/base.html" %}
+
+{% block title %}My Sample App{% endblock title %}
+
+{% block styles %}
+{{super()}}
+<link href="{{ url_for('static', filename='css/myapp.css') }}" rel="stylesheet" type="text/css" media="screen">
+{% endblock %}
+
+{% block nav_bar %}
+<nav class="ink-navigation vertical-space">
+    <ul class="horizontal menu black rounded shadowed">
+        <li class="active">
+            <a href="/">Sample App</a>
+        </li>
+        <li>
+            <a href="http://ink.sapo.pt/" target="_blank">
+                Sapo Ink <i class="icon-external-link"></i>
+            </a>
+        </li>
+        <li>
+            <a href="http://flask.pocoo.org/" target="_blank">
+                Flask <i class="icon-external-link"></i>
+            </a>
+        </li>
+    </ul>
+</nav>
+{% endblock nav_bar %}
+
+{% block content %}
+<div class="column-group gutters">
+    <div class="large-100 medium-100 small-100 show-all">
+        <h1>Welcome to the Sample App</h1>
+        <p>
+            <em>This is my sample page. There are many like it, but this one is mine.</em>
+        </p>
+
+        <p>
+            Just a quick example to show that this actually works. If you don't know what 
+            <a href="http://ink.sapo.pt/" target="_blank">Sapo Ink <i class="icon-extrenal-link"></i></a>, I'll lay it out for you real quick - it's a kick-ass, 'as simple as it gets'
+            front-end framework. It enables you to build <strong>elegant and responsive web applications</strong> quickly and easily.
+        </p>
+    </div>
+</div>
+{% endblock %}
