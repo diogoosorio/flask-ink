@@ -1,7 +1,7 @@
 #!/usr/env/python
 # -*- coding: utf-8 -*-
 
-from Flask import g
+from flask import g
 
 __version__ = '2.2.1'
 
@@ -28,9 +28,10 @@ class SapoCDN(AssetLocation):
 
 
 class AssetManager(object):
-    def __init__(self, location_map={}, minified=False):
+    def __init__(self, location_map={}, minified=False, asset_version=None):
         self.location_map = location_map
         self.minified = minified
+        self.asset_version=asset_version
 
     def load(self, filename, location='sapo'):
         location_instance = self.get_location_by_name(location)
@@ -57,13 +58,17 @@ class Ink(object):
         self.init_app()
 
     def init_app(self):
-        key_minified_assets = 'INK_MINIFIED_ASSETS'
-        minified_assets = self.app.config[key_minified_assets] if key_minified_assets else False
+        self.app.config.setdefault('INK_MINIFIED_ASSETS', False);
+        self.app.config.setdefault('INK_ASSET_VERSION', __version__)
 
-        self.assets = AssetManager(minified=minfied_assets)
+        minified_assets = self.app.config['INK_MINIFIED_ASSETS']
+        asset_version = self.app.config['INK_ASSET_VERSION']
+
+        self.assets = AssetManager(minified=minified_assets, asset_version=asset_version)
         self.make_default_asset_locations()
 
-        g.ink = self
+        with self.app.app_context():
+            g.ink = self
 
     def make_default_asset_locations(self):
         sapo = SapoCDN()
