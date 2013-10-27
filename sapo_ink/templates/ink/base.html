@@ -11,7 +11,10 @@
         {%- endblock metas %}
 
         {%- block styles %}
-        <link href="{{ink.load_static_asset('css/ink.css', from='sapo')}}" rel="stylesheet" media="screen" charset="utf-8">
+        <link href="{{ink.load_static_asset('css/ink.css', from='sapo')}}" rel="stylesheet" type="text/css" media="screen" charset="utf-8">
+        <!--[if lte IE 7 ]>
+            <link rel="{{ink.load_static_asset('css/ink-ie7.css', from='sapo')}} rel="stylesheet" type="text/css" media="screen" charset="utf-8">
+        <![endif]-->
         {%- endblock styles %}
         {%- endblock head %}
     </head>
