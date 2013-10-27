@@ -1,0 +1,35 @@
+{%- block document -%}
+<!DOCTYPE html>
+<html{% block html_attributes %}{% endblock html_attributes %}>
+{%- block html %}
+    <head>
+        {%- block head %}
+        <title>{% block title %}{% endblock title %}</title>
+
+        {%- block metas %}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        {%- endblock metas %}
+
+        {%- block styles %}
+        <link href="{{ink.load_static_asset('css/ink.css', from='sapo')}}" rel="stylesheet" media="screen" charset="utf-8">
+        {%- endblock styles %}
+        {%- endblock head %}
+    </head>
+    <body {% block body_attributes %}{% endblock body_attributes %}>
+        {% block body -%}
+
+        {% block nav_bar -%}
+        {%- endblock nav_bar %}
+
+        {% block content -%}
+        {% -endblock content %}
+
+        {% block scripts %}
+        <script src="{{ink.load_static_asset('js/ink.js', from='sapo')}}"></script>
+        {% endbock scripts %}
+
+        {%- endblock body %}
+    </body>
+{%- endblock html %}
+</html>
+{%- endblock document -%}
