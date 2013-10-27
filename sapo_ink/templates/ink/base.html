@@ -3,7 +3,7 @@
 <html{% block html_attributes %}{% endblock html_attributes %}>
 {%- block html %}
     <head>
-        {%- block head %}
+    {%- block head %}
         <title>{% block title %}{% endblock title %}</title>
 
         {%- block metas %}
@@ -16,10 +16,11 @@
             <link rel="{{ink_load_asset('css/ink-ie7.css')}} rel="stylesheet" type="text/css" media="screen" charset="utf-8">
         <![endif]-->
         {%- endblock styles %}
-        {%- endblock head %}
+    {%- endblock head %}
     </head>
     <body {% block body_attributes %}{% endblock body_attributes %}>
-        {% block body -%}
+    {% block body -%}
+        <div class="ink-grid">
 
         {% block nav_bar -%}
         {%- endblock nav_bar %}
@@ -31,7 +32,8 @@
         <script src="{{ink_load_asset('js/ink.js')}}"></script>
         {% endblock scripts %}
 
-        {%- endblock body %}
+        </div>
+    {%- endblock body %}
     </body>
 {%- endblock html %}
 </html>
