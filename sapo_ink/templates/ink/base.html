@@ -11,9 +11,9 @@
         {%- endblock metas %}
 
         {%- block styles %}
-        <link href="{{g.ink.assets.load('css/ink.css', location='sapo')}}" rel="stylesheet" type="text/css" media="screen" charset="utf-8">
+        <link href="{{ink_load_asset('css/ink.css', location='sapo')}}" rel="stylesheet" type="text/css" media="screen" charset="utf-8">
         <!--[if lte IE 7 ]>
-            <link rel="{{g.ink.assets.load('css/ink-ie7.css', location='sapo')}} rel="stylesheet" type="text/css" media="screen" charset="utf-8">
+            <link rel="{{ink_load_asset('css/ink-ie7.css', location='sapo')}} rel="stylesheet" type="text/css" media="screen" charset="utf-8">
         <![endif]-->
         {%- endblock styles %}
         {%- endblock head %}
@@ -25,11 +25,11 @@
         {%- endblock nav_bar %}
 
         {% block content -%}
-        {% -endblock content %}
+        {%- endblock content %}
 
         {% block scripts %}
-        <script src="{{g.ink.assets.load('js/ink.js', from='sapo')}}"></script>
-        {% endbock scripts %}
+        <script src="{{ink_load_asset('js/ink.js', location='sapo')}}"></script>
+        {% endblock scripts %}
 
         {%- endblock body %}
     </body>
