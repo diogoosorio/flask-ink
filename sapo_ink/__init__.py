@@ -46,14 +46,13 @@ class AssetManager(object):
 
         filename = filename.strip('/')
 
-        print self.minified
         if self.minified:
-            filename = self.get_minified_filename(filename)
+            filename = '%s.min.%s' % tuple(filename.rsplit('.', 1))
 
         asset_location = location_instance.get_url_for(filename)
 
         if self.append_querystring:
-            asset_location = self.append_querystring_filename(asset_location)
+            asset_location = '{0}?v={1}'.format(asset_location, self.asset_version)
 
         return asset_location
 
