@@ -72,15 +72,15 @@ class Ink(object):
         self.init_app()
 
     def init_app(self):
-        self.app.config.setdefault('INK_ASSET_MINIFY', False);
-        self.app.config.setdefault('INK_ASSET_VERSION', __version__)
-        self.app.config.setdefault('INK_ASSET_DEFAULT_LOCATION', 'sapo')
-        self.app.config.setdefault('INK_ASSET_APPEND_VERSION_QUERYSTRING', False)
+        self.app.config.setdefault('INK_MINIFIED_ASSETS', False);
+        self.app.config.setdefault('INK_VERSION', __version__)
+        self.app.config.setdefault('INK_DEFAULT_ASSET_LOCATION', 'sapo')
+        self.app.config.setdefault('INK_QUERYSTRING_VERSION', False)
 
-        minified_assets = self.app.config['INK_ASSET_MINIFY']
-        asset_version = self.app.config['INK_ASSET_VERSION']
-        asset_location = self.app.config['INK_ASSET_DEFAULT_LOCATION']
-        append_version = self.app.config['INK_ASSET_APPEND_VERSION_QUERYSTRING']
+        minified_assets = self.app.config['INK_MINIFIED_ASSETS']
+        asset_version = self.app.config['INK_VERSION']
+        asset_location = self.app.config['INK_DEFAULT_ASSET_LOCATION']
+        append_version = self.app.config['INK_QUERYSTRING_VERSION']
 
         self.assets = AssetManager(
             minified=minified_assets, asset_version=asset_version,
