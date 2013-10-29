@@ -1,7 +1,9 @@
 #!/usr/env/python
 # -*- coding: utf-8 -*-
 
-import re, flask, ink
+import re
+import flask
+import ink
 
 class AssetLocation(object):
     def asset_url(self, filename, minified=False, version=None):
@@ -15,7 +17,6 @@ class AssetLocation(object):
             version = __version__
 
         return filename+'?v='+version
-
 
 
 class LocalAssets(AssetLocation):
@@ -41,7 +42,6 @@ class ExternalLocation(AssetLocation):
 
         tokens['base_url'] = self.base_url
         self.tokens = tokens
-
 
     def compile_baseurl(self, version=None):
         regex = re.compile('\{(\w+)\}')
@@ -76,7 +76,6 @@ class SapoCDN(ExternalLocation):
 
         super(SapoCDN, self).__init__(base_url, url_pattern, tokens)
 
-
     def minified_filename(self, filename):
         filename_parts = filename.rsplit('.', 1)
         extension = filename_parts[1]
@@ -101,14 +100,12 @@ class AssetManager(object):
         if self.default_location is not None:
             self.get_location_by_name(self.default_location)
 
-
     def load(self, filename, location=None):
         location = location or self.default_location
         location_instance = self.get_location_by_name(location)
 
         filename = filename.strip('/')
         return location_instance.asset_url(filename, self.minified, self.asset_version)
-
 
     def get_location_by_name(self, name):
         if name in self.location_map:

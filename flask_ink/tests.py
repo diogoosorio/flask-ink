@@ -6,7 +6,6 @@ import flask
 import assets
 import ink
 
-
 class LocalAssetsTestCase(unittest.TestCase):
     def setUp(self):
         self.instance = assets.LocalAssets()
