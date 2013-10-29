@@ -1,7 +1,11 @@
 #!/usr/env/python
 # -*- coding: utf-8 -*-
 
-import unittest, flask, assets, ink
+import unittest
+import flask
+import assets
+import ink
+
 
 class LocalAssetsTestCase(unittest.TestCase):
     def setUp(self):
@@ -14,8 +18,8 @@ class LocalAssetsTestCase(unittest.TestCase):
             actual = self.instance.asset_url('ink.css')
             self.assertEquals(expected, actual)
 
-class ExternalLocationTestCase(unittest.TestCase):
 
+class ExternalLocationTestCase(unittest.TestCase):
     def setUp(self):
         self.external_location = assets.ExternalLocation('https://code.jquery.com/')
 
@@ -49,11 +53,10 @@ class ExternalLocationTestCase(unittest.TestCase):
 
         expected_url = '//cdn.ink.sapo.pt/demo.min.css?v='+version
         actual_url = instance.asset_url(filename, True, version)
-
         self.assertEquals(expected_url, actual_url)
 
-class SapoCDNTestCase(unittest.TestCase):
 
+class SapoCDNTestCase(unittest.TestCase):
     def setUp(self):
         self.instance = assets.SapoCDN()
 
@@ -67,8 +70,8 @@ class SapoCDNTestCase(unittest.TestCase):
 
         self.assertEquals(expected_url, actual_url)
 
-class AssetManagerTestCase(unittest.TestCase):
 
+class AssetManagerTestCase(unittest.TestCase):
     def setUp(self):
         self.instance = assets.AssetManager()
         self.local_asset = assets.LocalAssets()
@@ -79,11 +82,11 @@ class AssetManagerTestCase(unittest.TestCase):
         self.instance.register_location('local', self.local_asset)
 
         with self.app.test_request_context('/page'):
-            expected = '/static/css/development.css'
+            expected = '/static/ink/development.css'
             actual = self.instance.load('development.css', 'local')
             self.assertEquals(expected, actual)
 
-            with self.assertRaises(ValueError):
+            with self.assertRaises(assets.UnknownAssetLocationError):
                 self.instance.load('development.css', 'sapo')
 
 
@@ -91,7 +94,7 @@ class AssetManagerTestCase(unittest.TestCase):
         self.instance.register_location('project', self.local_asset)
         self.instance.register_location('sapo', self.sapo_cdn)
 
-        expected_project = '/static/development.css'
+        expected_project = '/static/ink/css/development.css'
         expected_sapo = '//cdn.ink.sapo.pt/'+ink.__version__+'/css/development.css'
 
         with self.app.test_request_context('/page'):
@@ -104,7 +107,7 @@ class AssetManagerTestCase(unittest.TestCase):
         instance.register_location('local', self.local_asset)
         instance.register_location('sapo', self.sapo_cdn)
 
-        expected_project = '/static/css/development.min.css?v=1.0'
+        expected_project = '/static/ink/css/development.min.css?v=1.0'
         expected_sapo = '//cdn.ink.sapo.pt/1.0/css/development-min.css?v=1.0'
 
         with self.app.test_request_context('/page'):
@@ -120,13 +123,14 @@ class AssetManagerTestCase(unittest.TestCase):
 
         instance = assets.AssetManager(
                 minified=True, asset_version='10.0', append_querystring=True,
-                location_map={'local': self.local_asset})
+                location_map={'local': self.local_asset}, default_location='local')
 
-        expected_local = '/static/css/development.min.css?v=10.0'
-        self.assertEquals(expected_local, instance.load('css/development.css'))
+        with self.app.test_request_context('/page'):
+            expected_local = '/static/ink/css/development.min.css?v=10.0'
+            self.assertEquals(expected_local, instance.load('css/development.css'))
 
-        with self.assertRaises(assets.UnknownAssetLocationError):
-            instance.load('css/development.css', 'sapo')
+            with self.assertRaises(assets.UnknownAssetLocationError):
+                instance.load('css/development.css', 'sapo')
 
 
 if __name__ == '__main__':
