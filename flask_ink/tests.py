@@ -102,7 +102,7 @@ class AssetManagerTestCase(unittest.TestCase):
 
 
     def test_load_with_multiple_locations_minified(self):
-        instance = assets.AssetManager(minified=True, asset_version='1.0', append_querystring=True)
+        instance = assets.AssetManager(minified=True, asset_version='1.0')
         instance.register_location('local', self.local_asset)
         instance.register_location('sapo', self.sapo_cdn)
 
@@ -116,13 +116,9 @@ class AssetManagerTestCase(unittest.TestCase):
 
     def test_load_with_default_location(self):
         with self.assertRaises(assets.UnknownAssetLocationError):
-            assets.AssetManager(
-                minified=True, asset_version='10.0',
-                append_querystring=True, default_location='local')
+            assets.AssetManager(minified=True, asset_version='10.0', default_location='local')
 
-        instance = assets.AssetManager(
-                minified=True, asset_version='10.0', append_querystring=True,
-                location_map={'local': self.local_asset}, default_location='local')
+        instance = assets.AssetManager(minified=True, asset_version='10.0', location_map={'local': self.local_asset}, default_location='local')
 
         with self.app.test_request_context('/page'):
             expected_local = '/static/ink/css/development.min.css?v=10.0'
