@@ -3,13 +3,13 @@
 
 from flask import Flask, render_template
 from flask.ext.appconfig import AppConfig
-from flask_ink.ink import Ink
+import flask_ink.ink as ink
 
 def create_app(configfile=None):
     app = Flask('sample_app')
     AppConfig(app, configfile)
 
-    Ink(app)
+    ink.Ink(app)
 
     @app.route('/')
     def index():
