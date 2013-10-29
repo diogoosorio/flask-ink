@@ -3,7 +3,7 @@
 
 from flask import Flask, render_template
 from flask.ext.appconfig import AppConfig
-from flask_ink import Ink
+from flask_ink.ink import Ink
 
 def create_app(configfile=None):
     app = Flask('sample_app')

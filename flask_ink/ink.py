@@ -15,18 +15,14 @@ class Ink(object):
         self.app.config.setdefault('INK_MINIFIED_ASSETS', False);
         self.app.config.setdefault('INK_VERSION', __version__)
         self.app.config.setdefault('INK_DEFAULT_ASSET_LOCATION', 'sapo')
-        self.app.config.setdefault('INK_QUERYSTRING_VERSION', False)
 
         minified_assets = self.app.config['INK_MINIFIED_ASSETS']
         asset_version = self.app.config['INK_VERSION']
         asset_location = self.app.config['INK_DEFAULT_ASSET_LOCATION']
-        append_version = self.app.config['INK_QUERYSTRING_VERSION']
 
-        self.assets = AssetManager(
-            minified=minified_assets, asset_version=asset_version,
-            default_location=asset_location, append_querystring=append_version)
-
+        self.assets = assets.AssetManager(minified=minified_assets, asset_version=asset_version)
         self.make_default_asset_locations()
+        self.assets.default_location = asset_location
 
         blueprint = flask.Blueprint(
             'ink',
@@ -39,8 +35,8 @@ class Ink(object):
         self.app.jinja_env.globals.update(ink_load_asset=self.assets.load)
 
     def make_default_asset_locations(self):
-        sapo = SapoCDN()
-        local = LocalAssets()
+        sapo = assets.SapoCDN()
+        local = assets.LocalAssets()
 
         self.assets.register_location('sapo', sapo)
         self.assets.register_location('local', local)
