@@ -1,6 +1,8 @@
 #!/usr/env/python
 # -*- coding: utf-8 -*-
 
+import re
+
 class AssetLocation(object):
     def asset_url(self, filename, minified=False, version=None):
         raise NotImplementedError
@@ -21,14 +23,26 @@ class ExternalLocation(AssetLocation):
     def minified_filename(self, filename):
         return '%s.min.%s' % tuple(filename.rsplit('.', 1))
 
+    def compile_baseurl(self, version=None):
+        regex = re.compile('\{(\w+)\}')
+        symbols = regex.findall(self.url_pattern)
+        known_symbols = ['version']
+        unknown_symbols = set(symbols) - set(known_symbols)
+
+        if len(unknown_symbols):
+            raise RuntimeError("Unknown symbols on your url_pattern: {}".format(unknown_symbols))
+
+        return self.base_url.format(version=version)
+
     def asset_url(self, filename, minified=False, version=None):
         if minified:
             filename = self.minified_filename(filename)
 
-        url = self.url_pattern
-        # TODO: generate the url from the patterns
+        base_url = self.compile_baseurl(version)
+        base_url += '/'+filename
 
         return url
+
 
 class SapoCDN(ExternalLocation):
     def minified_filename(self, filename):
