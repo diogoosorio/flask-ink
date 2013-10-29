@@ -1,7 +1,7 @@
 #!/usr/env/python
 # -*- coding: utf-8 -*-
 
-import re
+import re, flask, ink
 
 class AssetLocation(object):
     def asset_url(self, filename, minified=False, version=None):
@@ -13,12 +13,19 @@ class LocalAssets(AssetLocation):
 
     def asset_url(self, filename):
         filename = "ink/{0}".format(filename)
-        return url_for(self.directory, filename=filename)
+        return flask.url_for(self.directory, filename=filename)
 
 class ExternalLocation(AssetLocation):
-    def __init__(self, base_url, url_pattern="//{base_url}/{filename}"):
+    def __init__(self, base_url, url_pattern="//{base_url}/{filename}", symbols = {}):
         self.base_url = base_url.rstrip('/')
         self.url_pattern = url_pattern
+
+        symbols['base_url'] = base_url
+
+        if not 'version' in symbols:
+            symbols['version'] = ink.__version__
+
+        self.symbols = symbols
 
     def minified_filename(self, filename):
         return '%s.min.%s' % tuple(filename.rsplit('.', 1))
@@ -26,7 +33,7 @@ class ExternalLocation(AssetLocation):
     def compile_baseurl(self, version=None):
         regex = re.compile('\{(\w+)\}')
         symbols = regex.findall(self.url_pattern)
-        known_symbols = ['version']
+        known_symbols = self.symbols
         unknown_symbols = set(symbols) - set(known_symbols)
 
         if len(unknown_symbols):
