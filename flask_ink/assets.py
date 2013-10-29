@@ -7,13 +7,31 @@ class AssetLocation(object):
     def asset_url(self, filename, minified=False, version=None):
         raise NotImplementedError
 
+    def minified_filename(self, filename):
+        return '%s.min.%s' % tuple(filename.rsplit('.', 1))
+
+    def versioned_filename(self, filename, version):
+        if type(version) is bool:
+            version = __version__
+
+        return filename+'?v='+version
+
+
+
 class LocalAssets(AssetLocation):
     def __init__(self, directory='static'):
         self.directory = directory
 
-    def asset_url(self, filename):
+    def asset_url(self, filename, minified=False, version=None):
+        filename = self.minified_filename(filename) if minified else filename
         filename = "ink/{0}".format(filename)
-        return flask.url_for(self.directory, filename=filename)
+
+        params = {'filename': filename}
+
+        if version:
+            params['v'] = version
+
+        return flask.url_for(self.directory, **params)
 
 
 class ExternalLocation(AssetLocation):
@@ -22,12 +40,7 @@ class ExternalLocation(AssetLocation):
         self.url_pattern = url_pattern.rstrip('/')
 
         tokens['base_url'] = self.base_url
-
         self.tokens = tokens
-
-
-    def minified_filename(self, filename):
-        return '%s.min.%s' % tuple(filename.rsplit('.', 1))
 
 
     def compile_baseurl(self, version=None):
@@ -47,14 +60,8 @@ class ExternalLocation(AssetLocation):
 
 
     def asset_url(self, filename, minified=False, version=None):
-        if minified:
-            filename = self.minified_filename(filename)
-
-        if version and type(version) is bool:
-            version = __version__
-
-        if version:
-            filename += '?v='+version
+        filename = self.minified_filename(filename) if minified else filename
+        filename = self.versioned_filename(filename, version) if version else filename
 
         base_url = self.compile_baseurl(version)
         base_url += '/'+filename
@@ -63,12 +70,12 @@ class ExternalLocation(AssetLocation):
 
 
 class SapoCDN(ExternalLocation):
-
     def __init__(self, tokens = {}):
         base_url = 'cdn.ink.sapo.pt'
         url_pattern = '//{base_url}/{version}'
 
         super(SapoCDN, self).__init__(base_url, url_pattern, tokens)
+
 
     def minified_filename(self, filename):
         filename_parts = filename.rsplit('.', 1)
@@ -86,31 +93,34 @@ class AssetManager(object):
         self.location_map = location_map
         self.minified = minified
         self.asset_version = asset_version
-        self.default_location = default_location or 'sapo'
+        self.default_location = default_location
         self.append_querystring = append_querystring
+
+        # Make sure we have a valid default location, as the get_location_by_name method
+        # raises an error if it isn't registered
+        if self.default_location is not None:
+            self.get_location_by_name(self.default_location)
+
 
     def load(self, filename, location=None):
         location = location or self.default_location
         location_instance = self.get_location_by_name(location)
 
         filename = filename.strip('/')
+        return location_instance.asset_url(filename, self.minified, self.asset_version)
 
-        if self.minified:
-            filename = '%s.min.%s' % tuple(filename.rsplit('.', 1))
-
-        asset_location = location_instance.get_url_for(filename)
-
-        if self.append_querystring:
-            asset_location = '{0}?v={1}'.format(asset_location, self.asset_version)
-
-        return asset_location
 
     def get_location_by_name(self, name):
         if name in self.location_map:
             return self.location_map[name]
 
-        raise ValueError("Unkown location instance {location_name}.".format(location_name=name))
+        name = '' if type(name) != str else name
+        raise UnknownAssetLocationError("Unkown location instance "+name)
+
 
     def register_location(self, name, location):
         self.location_map[name] = location
 
+
+class UnknownAssetLocationError(RuntimeError):
+    pass
