@@ -73,16 +73,18 @@ class AssetManagerTestCase(unittest.TestCase):
         self.instance = assets.AssetManager()
         self.local_asset = assets.LocalAssets()
         self.sapo_cdn = assets.SapoCDN()
+        self.app = flask.Flask(__name__)
 
     def test_load_with_invalid_asset_location(self):
         self.instance.register_location('local', self.local_asset)
 
-        expected = '/static/css/development.css'
-        actual = self.instance.load('development.css', 'local')
-        self.assertEquals(expected, actual)
+        with self.app.test_request_context('/page'):
+            expected = '/static/css/development.css'
+            actual = self.instance.load('development.css', 'local')
+            self.assertEquals(expected, actual)
 
-        with self.assertRaises(ValueError):
-            self.instance.load('development.css', 'sapo')
+            with self.assertRaises(ValueError):
+                self.instance.load('development.css', 'sapo')
 
 
     def test_load_with_multiple_locations(self):
@@ -92,8 +94,9 @@ class AssetManagerTestCase(unittest.TestCase):
         expected_project = '/static/development.css'
         expected_sapo = '//cdn.ink.sapo.pt/'+ink.__version__+'/css/development.css'
 
-        self.assertEquals(expected_project, self.instance.load('css/development.css', 'project'))
-        self.assertEquals(expected_sapo, self.instance.load('css/development.css', 'sapo'))
+        with self.app.test_request_context('/page'):
+            self.assertEquals(expected_project, self.instance.load('css/development.css', 'project'))
+            self.assertEquals(expected_sapo, self.instance.load('css/development.css', 'sapo'))
 
 
     def test_load_with_multiple_locations_minified(self):
@@ -104,8 +107,9 @@ class AssetManagerTestCase(unittest.TestCase):
         expected_project = '/static/css/development.min.css?v=1.0'
         expected_sapo = '//cdn.ink.sapo.pt/1.0/css/development-min.css?v=1.0'
 
-        self.assertEquals(expected_project, instance.load('css/development.css', 'local'))
-        self.assertEquals(expected_sapo, instance.load('css/development.css', 'sapo'))
+        with self.app.test_request_context('/page'):
+            self.assertEquals(expected_project, instance.load('css/development.css', 'local'))
+            self.assertEquals(expected_sapo, instance.load('css/development.css', 'sapo'))
 
 
     def test_load_with_default_location(self):
