@@ -15,43 +15,61 @@ class LocalAssets(AssetLocation):
         filename = "ink/{0}".format(filename)
         return flask.url_for(self.directory, filename=filename)
 
+
 class ExternalLocation(AssetLocation):
-    def __init__(self, base_url, url_pattern="//{base_url}/{filename}", symbols = {}):
+    def __init__(self, base_url, url_pattern="//{base_url}", tokens = {}):
         self.base_url = base_url.rstrip('/')
-        self.url_pattern = url_pattern
+        self.url_pattern = url_pattern.rstrip('/')
 
-        symbols['base_url'] = base_url
+        tokens['base_url'] = self.base_url
 
-        if not 'version' in symbols:
-            symbols['version'] = ink.__version__
+        self.tokens = tokens
 
-        self.symbols = symbols
 
     def minified_filename(self, filename):
         return '%s.min.%s' % tuple(filename.rsplit('.', 1))
 
+
     def compile_baseurl(self, version=None):
         regex = re.compile('\{(\w+)\}')
-        symbols = regex.findall(self.url_pattern)
-        known_symbols = self.symbols
-        unknown_symbols = set(symbols) - set(known_symbols)
+        tokens = regex.findall(self.url_pattern)
+        known_tokens = self.tokens
 
-        if len(unknown_symbols):
-            raise RuntimeError("Unknown symbols on your url_pattern: {}".format(unknown_symbols))
+        version = version or ink.__version__
+        known_tokens['version'] = version
 
-        return self.base_url.format(version=version)
+        unknown_tokens = set(tokens) - set(known_tokens)
+
+        if len(unknown_tokens):
+            raise RuntimeError("Unknown tokens on your url_pattern: {}".format(unknown_tokens))
+
+        return self.url_pattern.format(**known_tokens)
+
 
     def asset_url(self, filename, minified=False, version=None):
         if minified:
             filename = self.minified_filename(filename)
 
+        if version and type(version) is bool:
+            version = __version__
+
+        if version:
+            filename += '?v='+version
+
         base_url = self.compile_baseurl(version)
         base_url += '/'+filename
 
-        return url
+        return base_url
 
 
 class SapoCDN(ExternalLocation):
+
+    def __init__(self, tokens = {}):
+        base_url = 'cdn.ink.sapo.pt'
+        url_pattern = '//{base_url}/{version}'
+
+        super(SapoCDN, self).__init__(base_url, url_pattern, tokens)
+
     def minified_filename(self, filename):
         filename_parts = filename.rsplit('.', 1)
         extension = filename_parts[1]
@@ -63,8 +81,7 @@ class SapoCDN(ExternalLocation):
 class AssetManager(object):
     def __init__(
         self, location_map={}, minified=False, asset_version=None,
-        default_location=None, append_querystring=False
-        ):
+        default_location=None, append_querystring=False):
 
         self.location_map = location_map
         self.minified = minified
