@@ -67,5 +67,63 @@ class SapoCDNTestCase(unittest.TestCase):
 
         self.assertEquals(expected_url, actual_url)
 
+class AssetManagerTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.instance = assets.AssetManager()
+        self.local_asset = assets.LocalAssets()
+        self.sapo_cdn = assets.SapoCDN()
+
+    def test_load_with_invalid_asset_location(self):
+        self.instance.register_location('local', self.local_asset)
+
+        expected = '/static/css/development.css'
+        actual = self.instance.load('development.css', 'local')
+        self.assertEquals(expected, actual)
+
+        with self.assertRaises(ValueError):
+            self.instance.load('development.css', 'sapo')
+
+
+    def test_load_with_multiple_locations(self):
+        self.instance.register_location('project', self.local_asset)
+        self.instance.register_location('sapo', self.sapo_cdn)
+
+        expected_project = '/static/development.css'
+        expected_sapo = '//cdn.ink.sapo.pt/'+ink.__version__+'/css/development.css'
+
+        self.assertEquals(expected_project, self.instance.load('css/development.css', 'project'))
+        self.assertEquals(expected_sapo, self.instance.load('css/development.css', 'sapo'))
+
+
+    def test_load_with_multiple_locations_minified(self):
+        instance = assets.AssetManager(minified=True, asset_version='1.0', append_querystring=True)
+        instance.register_location('local', self.local_asset)
+        instance.register_location('sapo', self.sapo_cdn)
+
+        expected_project = '/static/css/development.min.css?v=1.0'
+        expected_sapo = '//cdn.ink.sapo.pt/1.0/css/development-min.css?v=1.0'
+
+        self.assertEquals(expected_project, instance.load('css/development.css', 'local'))
+        self.assertEquals(expected_sapo, instance.load('css/development.css', 'sapo'))
+
+
+    def test_load_with_default_location(self):
+        with self.assertRaises(assets.UnknownAssetLocationError):
+            assets.AssetManager(
+                minified=True, asset_version='10.0',
+                append_querystring=True, default_location='local')
+
+        instance = assets.AssetManager(
+                minified=True, asset_version='10.0', append_querystring=True,
+                location_map={'local': self.local_asset})
+
+        expected_local = '/static/css/development.min.css?v=10.0'
+        self.assertEquals(expected_local, instance.load('css/development.css'))
+
+        with self.assertRaises(assets.UnknownAssetLocationError):
+            instance.load('css/development.css', 'sapo')
+
+
 if __name__ == '__main__':
     unittest.main()
