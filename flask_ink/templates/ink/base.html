@@ -20,19 +20,19 @@
     </head>
     <body {% block body_attributes %}{% endblock body_attributes %}>
     {% block body -%}
-        <div class="ink-grid">
-
         {% block nav_bar -%}
         {%- endblock nav_bar %}
 
         {% block content -%}
         {%- endblock content %}
 
+        {% block footer -%}
+        {%- endblock footer %}
+
         {% block scripts %}
         <script src="{{ink_load_asset('js/ink.js')}}"></script>
         {% endblock scripts %}
 
-        </div>
     {%- endblock body %}
     </body>
 {%- endblock html %}
