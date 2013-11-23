@@ -1,12 +1,12 @@
 #!/usr/env/python
 # -*- coding: utf-8 -*-
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='Flask-Ink',
     version='2.2.1',
-    url='http://github.com/diogoosorio/flask-ink',
+    url='https://github.com/diogoosorio/flask-sapo-ink',
     license='MIT',
     author='Diogo Osório',
     author_email='diogo.g.osorio@gmail.com',
