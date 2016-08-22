@@ -75,10 +75,10 @@ Take a peek at the [base.html](flask_ink/templates/ink/base.html) file for more 
 For your convenience, the extension will take in account a set of configuration parameters:
 
 ```python
-INK_ASSET_MINIFY = True  # Append a .min to the js/css files (ink.css -> ink.min.css)
-INK_ASSET_VERSION = '2.2.1' # Used to obtain the correct files from Sapo's CDN and by the INK_ASSET_APPEND_VERSION_QUERYSTRING
-INK_ASSET_DEFAULT_LOCATION = 'sapo' # Use Sapo's CDN to serve the files by default. 'local' to serve them from your app.
-INK_ASSET_APPEND_QUERYSTRING = True # Append a ?v={version_number} when incuding the files
+INK_MINIFIED_ASSETS = True  # Append a .min to the js/css files (ink.css -> ink.min.css)
+INK_VERSION = '2.2.1' # Used to obtain the correct files from Sapo's CDN and by the INK_ASSET_APPEND_VERSION_QUERYSTRING
+INK_DEFAULT_ASSET_LOCATION = 'sapo' # Use Sapo's CDN to serve the files by default. 'local' to serve them from your app.
+INK_QUERYSTRING_VERSION = True # Append a ?v={version_number} when incuding the files
 ```
 You can add these configuration parameters like you would [add any other configuration to your Flask app][4].
 
