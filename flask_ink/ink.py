@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import flask
-import assets
 
-__version__ = '2.2.1'
+from flask_ink import assets
+
+__version__ = '3.1.10'
 
 class Ink(object):
     def __init__(self, app):

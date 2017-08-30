@@ -3,8 +3,8 @@
 
 import unittest
 import flask
-import assets
-import ink
+
+from flask_ink import assets, ink
 
 class LocalAssetsTestCase(unittest.TestCase):
     def setUp(self):

@@ -3,7 +3,8 @@
 
 import re
 import flask
-import ink
+
+from flask_ink import ink
 
 class AssetLocation(object):
     """Abstractly represents a location from where your static files
